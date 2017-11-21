@@ -102,6 +102,7 @@ gameState.prototype = {
     create: function() {
 
 
+
         this.initGraphics();
         this.initSounds();
         this.initPhysics();
