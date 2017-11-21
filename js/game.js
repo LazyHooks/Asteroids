@@ -1,3 +1,6 @@
+//created by Mainak Roy
+//github handle: lazyhooks
+
 var gameProperties = {
     screenWidth: 640,
     screenHeight: 480,
@@ -6,6 +9,7 @@ var gameProperties = {
 };
 
 var states = {
+    main: "main",
     game: "game",
 };
 
@@ -96,12 +100,16 @@ gameState.prototype = {
     },
 
     create: function() {
+
+
         this.initGraphics();
         this.initSounds();
         this.initPhysics();
         this.initKeyboard();
         this.resetAsteroids();
     },
+
+
 
     update: function() {
         this.checkPlayerInput();
@@ -276,6 +284,8 @@ gameState.prototype = {
 
         if (this.shipLives) {
             game.time.events.add(Phaser.Timer.SECOND * shipProperties.timeToReset, this.resetShip, this);
+        } else {
+            game.time.events.add(Phaser.Timer.SECOND * shipProperties.timeToReset, this.endGame, this);
         }
     },
 
@@ -317,8 +327,34 @@ gameState.prototype = {
 
         this.resetAsteroids();
     },
+
+    endGame: function() {
+        game.state.start(states.main);
+    },
+};
+
+var mainState = function(game) {
+    this.tf_start;
+};
+
+mainState.prototype = {
+    create: function() {
+        var startInstructions = 'Click to Start -\n\nUP arrow key for thrust.\n\nLEFT and RIGHT arrow keys to turn.\n\nSPACE key to fire.';
+
+        this.tf_start = game.add.text(game.world.centerX, game.world.centerY, startInstructions, fontAssets.counterFontStyle);
+        this.tf_start.align = 'center';
+        this.tf_start.anchor.set(0.5, 0.5);
+        game.input.onDown.addOnce(this.startGame, this);
+
+    },
+
+    startGame: function() {
+        game.state.start(states.game);
+    },
 };
 
 var game = new Phaser.Game(gameProperties.screenWidth, gameProperties.screenHeight, Phaser.AUTO, 'gameDiv');
+game.state.add(states.main, mainState);
 game.state.add(states.game, gameState);
+game.state.start(states.main);
 game.state.start(states.game);
